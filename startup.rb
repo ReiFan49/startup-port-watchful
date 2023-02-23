@@ -128,9 +128,12 @@ def gui_scan
     end.tap do |block|
       area_handler.Draw = block
     end
-    area_handler.MouseEvent =
-      area_handler.MouseCrossed =
-      area_handler.DragBroken = Fiddle::Closure::BlockCaller.new(0, [0]) do end
+    Fiddle::Closure::BlockCaller.new(0, [0]) do
+    end.tap do |dud_block|
+      area_handler.MouseEvent =
+        area_handler.MouseCrossed =
+        area_handler.DragBroken = dud_block
+    end
     Fiddle::Closure::BlockCaller.new(1, [0]) do 0 end
     .tap do |block|
       area_handler.KeyEvent = block
