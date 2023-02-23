@@ -170,14 +170,23 @@ def gui_scan
     LibUI.control_show(window)
   end.tap do |window|
     do_finish = proc do
-      # LibUI.control_destroy(window)
       LibUI.quit
-      Kernel.exit 0
+      # LibUI.control_destroy(window)
+      # $stderr.puts "DONE"
+      exit!
     end
-    Thread.new do
-      sleep 10
+    should_quit_handler = Fiddle::Closure::BlockCaller.new(1, [0]) do
+      # $stderr.puts "Should Quit"
+      LibUI.control_destroy(window)
+      1
+    end
+    LibUI.window_on_closing(window) do
+      # $stderr.puts "Closing"
+      sleep 3
       do_finish.call
-    end if false
+      0
+    end
+    LibUI.on_should_quit(should_quit_handler, window)
     Thread.new do
       sleep 0.1
       port_jobs.each do |port, thread|
@@ -186,13 +195,14 @@ def gui_scan
       port_jobs.each do |port, thread|
         thread.join if thread.alive?
       end
+      # $stderr.puts "All finish"
       sleep 1
       do_finish.call
     end
   end
+  # $stderr.puts "START"
   LibUI.main
-ensure
-  LibUI.quit
+  # $stderr.puts "EH?"
 end
 
 gui_scan
